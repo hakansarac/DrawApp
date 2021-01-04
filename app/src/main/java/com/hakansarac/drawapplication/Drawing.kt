@@ -3,6 +3,7 @@ package com.hakansarac.drawapplication
 import android.content.Context
 import android.graphics.* //multiple class from there
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
 
@@ -29,7 +30,7 @@ class Drawing(context : Context, attrs : AttributeSet) : View(context, attrs) {
         mDrawPaint!!.strokeJoin = Paint.Join.ROUND
         mDrawPaint!!.strokeCap = Paint.Cap.ROUND
         mCanvasPaint = Paint(Paint.DITHER_FLAG)
-        mBrushSize = 20.toFloat()
+        setBrushSize(12.toFloat())
     }
 
     //override onSizeChanged function of View Class
@@ -96,6 +97,11 @@ class Drawing(context : Context, attrs : AttributeSet) : View(context, attrs) {
         invalidate()    //Invalidate the whole view.
         return true
         //return super.onTouchEvent(event)
+    }
+
+    fun setBrushSize(newSize: Float){
+        mBrushSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,newSize,resources.displayMetrics)    //for screens which have different size
+        mDrawPaint!!.strokeWidth = mBrushSize
     }
 
     internal inner class CustomPath(var color : Int, var brushThickness: Float) : Path(){
