@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity() {
 
         mImageButtonSelected = linearLayoutColors[7] as ImageButton
         mImageButtonSelected!!.setImageDrawable(
-            ContextCompat.getDrawable(this,R.drawable.pallet_selected)
+            ContextCompat.getDrawable(this,R.drawable.palette_selected)
         )
 
         imageButtonBrush.setOnClickListener {
@@ -60,10 +60,10 @@ class MainActivity : AppCompatActivity() {
             val colorTag = imageButton.tag.toString()
             viewDrawing.setColor(colorTag)
             mImageButtonSelected!!.setImageDrawable(
-                ContextCompat.getDrawable(this,R.drawable.pallet_normal)
+                ContextCompat.getDrawable(this,R.drawable.palette_normal)
             )
             imageButton.setImageDrawable(
-                ContextCompat.getDrawable(this,R.drawable.pallet_selected)
+                ContextCompat.getDrawable(this,R.drawable.palette_selected)
             )
             mImageButtonSelected = imageButton
         }
