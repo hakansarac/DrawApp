@@ -1,10 +1,13 @@
 package com.hakansarac.drawapplication
 
 import android.Manifest
+import android.app.Activity
 import android.app.Dialog
+import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.View
 import android.widget.ImageButton
 import android.widget.Toast
@@ -33,7 +36,8 @@ class MainActivity : AppCompatActivity() {
 
         imageButtonGallery.setOnClickListener {
             if(isReadStorageAllowed()){
-
+                val pickPhotoIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                startActivityForResult(pickPhotoIntent,GALLERY)
             }else{
                 requestStoragePermission()
             }
@@ -85,7 +89,29 @@ class MainActivity : AppCompatActivity() {
 
     companion object{
         private const val STORAGE_PERMISSION_CODE = 1
+        private const val GALLERY = 2
     }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(resultCode== Activity.RESULT_OK){
+            if(requestCode==GALLERY){
+                try{
+                    if(data!!.data != null){    //yani görseli alıyosak bu if altında işlemlere devam ediyoruz.
+                        imageViewBackground.visibility = View.VISIBLE
+                        imageViewBackground.setImageURI(data.data)
+                    }else{
+                        Toast.makeText(this@MainActivity,
+                        "Image cannot be uploaded.",
+                        Toast.LENGTH_SHORT).show()
+                    }
+                }catch(e:Exception){
+                    e.printStackTrace()
+                }
+            }
+        }
+    }
+
 
     private fun requestStoragePermission(){
         if(ActivityCompat.shouldShowRequestPermissionRationale(this,
