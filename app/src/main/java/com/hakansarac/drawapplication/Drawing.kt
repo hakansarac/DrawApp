@@ -17,6 +17,7 @@ class Drawing(context : Context, attrs : AttributeSet) : View(context, attrs) {
     private var mColor = Color.BLACK
     private var mCanvas : Canvas? = null
     private val mPaths = ArrayList<CustomPath>() //list is immutable but its elements can be changed
+    private val mUndoPaths = ArrayList<CustomPath>()
 
     init{
         setUpDrawing()
@@ -108,6 +109,14 @@ class Drawing(context : Context, attrs : AttributeSet) : View(context, attrs) {
         mColor = Color.parseColor(newColor)
         mDrawPaint!!.color = mColor
     }
+
+    fun undo(){
+        if(mPaths.size > 0 ){
+            mUndoPaths.add(mPaths.removeAt(mPaths.size-1))
+            invalidate()   //Invalidate the whole view again.
+        }
+    }
+
     internal inner class CustomPath(var color : Int, var brushThickness: Float) : Path(){
 
     }
