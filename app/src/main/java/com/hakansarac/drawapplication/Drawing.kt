@@ -7,14 +7,43 @@ import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
 
+/**
+ * This class contains the attributes for the main layout of
+ * our application.
+ */
+
+/**
+ * The constructor for ViewForDrawing
+ * This constructor calls the setupDrawing()
+ * method. This constructor is called only
+ * once when the application layout is first
+ * created upon launch.
+ *
+ * @param context
+ * @param attrs
+ */
+
+/**
+ * The reference link to create this class is
+ * https://medium.com/@ssaurel/learn-to-create-a-paint-application-for-android-5b16968063f8
+ */
 class Drawing(context : Context, attrs : AttributeSet) : View(context, attrs) {
 
-    private var mDrawPath : CustomPath? = null
-    private var mCanvasBitmap : Bitmap? = null
-    private var mDrawPaint : Paint? = null
-    private var mCanvasPaint : Paint? = null
-    private var mBrushSize : Float = 0.toFloat()
-    private var mColor = Color.BLACK
+    private var mDrawPath : CustomPath? = null  // An variable of CustomPath inner class to use it further.
+    private var mCanvasBitmap : Bitmap? = null  // An instance of the Bitmap.
+    private var mDrawPaint : Paint? = null      // The Paint class holds the style and color information about how to draw geometries, text and bitmaps.
+    private var mCanvasPaint : Paint? = null    // Instance of canvas paint view.
+    private var mBrushSize : Float = 0.toFloat()    // A variable for stroke/brush size to draw on the canvas.
+    private var mColor = Color.BLACK            // A variable to hold a color of the stroke.
+
+    /**
+     * A variable for canvas which will be initialized later and used.
+     *
+     * The Canvas class holds the "draw" calls. To draw something, you need 4 basic components: A Bitmap to hold the pixels, a Canvas to host
+     * the draw calls (writing into the bitmap), a drawing primitive (e.g. Rect,
+     * Path, text, Bitmap), and a paint (to describe the colors and styles for the
+     * drawing)
+     */
     private var mCanvas : Canvas? = null
     private val mPaths = ArrayList<CustomPath>() //list is immutable but its elements can be changed
     private val mUndoPaths = ArrayList<CustomPath>()
@@ -23,15 +52,19 @@ class Drawing(context : Context, attrs : AttributeSet) : View(context, attrs) {
         setUpDrawing()
     }
 
+    /**
+     * This method initializes the attributes of the
+     * ViewForDrawing class.
+     */
     private fun setUpDrawing(){
         mDrawPath = CustomPath(mColor,mBrushSize)
         mDrawPaint = Paint()
         mDrawPaint!!.color = mColor
-        mDrawPaint!!.style = Paint.Style.STROKE
-        mDrawPaint!!.strokeJoin = Paint.Join.ROUND
-        mDrawPaint!!.strokeCap = Paint.Cap.ROUND
-        mCanvasPaint = Paint(Paint.DITHER_FLAG)
-        setBrushSize(12.toFloat())
+        mDrawPaint!!.style = Paint.Style.STROKE     // This is to draw a STROKE style
+        mDrawPaint!!.strokeJoin = Paint.Join.ROUND  // This is for store join
+        mDrawPaint!!.strokeCap = Paint.Cap.ROUND    // This is for stroke Cap
+        mCanvasPaint = Paint(Paint.DITHER_FLAG)     // Paint flag that enables dithering when blitting.
+        setBrushSize(12.toFloat())                  // Here the default or we can initial brush/ stroke size is defined.
     }
 
     //override onSizeChanged function of View Class
@@ -45,8 +78,25 @@ class Drawing(context : Context, attrs : AttributeSet) : View(context, attrs) {
     }
 
     //override onDraw function of View Class
+    /**
+     * This method is called when a stroke is drawn on the canvas
+     * as a part of the painting.
+     */
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
+
+        /**
+         * Draw the specified bitmap, with its top/left corner at (x,y), using the specified paint,
+         * transformed by the current matrix.
+         *
+         *If the bitmap and canvas have different densities, this function will take care of
+         * automatically scaling the bitmap to draw at the same density as the canvas.
+         *
+         * @param bitmap The bitmap to be drawn
+         * @param left The position of the left side of the bitmap being drawn
+         * @param top The position of the top side of the bitmap being drawn
+         * @param paint The paint used to draw the bitmap (may be null)
+         */
         canvas?.drawBitmap(mCanvasBitmap!!,0f,0f,mCanvasPaint) //0f, 0f -> top left corner
 
         for(path in mPaths){
@@ -64,6 +114,10 @@ class Drawing(context : Context, attrs : AttributeSet) : View(context, attrs) {
     }
 
     //override onTouchEvent function of View Class
+    /**
+     * This method acts as an event listener when a touch
+     * event is detected on the device.
+     */
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         val touchX = event?.x
         val touchY = event?.y
@@ -79,19 +133,19 @@ class Drawing(context : Context, attrs : AttributeSet) : View(context, attrs) {
                 mDrawPath!!.brushThickness = mBrushSize
                 //how thick the path is.
 
-                mDrawPath!!.reset()
+                mDrawPath!!.reset()     // Clear any lines and curves from the path, making it empty.
                 if(touchX != null && touchY != null)
-                    mDrawPath!!.moveTo(touchX,touchY)
+                    mDrawPath!!.moveTo(touchX,touchY)   // Set the beginning of the next contour to the point (x,y)
             }
 
             MotionEvent.ACTION_MOVE -> {
                 if(touchX != null && touchY != null)
-                    mDrawPath!!.lineTo(touchX,touchY)
+                    mDrawPath!!.lineTo(touchX,touchY)   // Add a line from the last point to the specified point (x,y)
             }
 
             MotionEvent.ACTION_UP -> {
                 mPaths.add(mDrawPath!!)
-                mDrawPath = CustomPath(mColor,mBrushSize)
+                mDrawPath = CustomPath(mColor,mBrushSize)   //Add when to stroke is drawn to canvas and added in the path arraylist
             }
             else -> return false
         }
@@ -100,16 +154,33 @@ class Drawing(context : Context, attrs : AttributeSet) : View(context, attrs) {
         //return super.onTouchEvent(event)
     }
 
+    /**
+     * This method is called when either the brush or the eraser
+     * sizes are to be changed. This method sets the brush/eraser
+     * sizes to the new values depending on user selection.
+     */
     fun setBrushSize(newSize: Float){
         mBrushSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,newSize,resources.displayMetrics)    //for screens which have different size
         mDrawPaint!!.strokeWidth = mBrushSize
     }
 
+    /**
+     * This function is called when the user desires a color change.
+     * This functions sets the color of a store to selected color and able to draw on view using that color.
+     *
+     * @param newColor
+     */
     fun setColor(newColor: String){
         mColor = Color.parseColor(newColor)
         mDrawPaint!!.color = mColor
     }
 
+    /**
+     * This function is called when the user selects the undo
+     * command from the application. This function removes the
+     * last stroke input by the user depending on the
+     * number of times undo has been activated.
+     */
     fun undo(){
         if(mPaths.size > 0 ){
             mUndoPaths.add(mPaths.removeAt(mPaths.size-1))
@@ -117,6 +188,7 @@ class Drawing(context : Context, attrs : AttributeSet) : View(context, attrs) {
         }
     }
 
+    // An inner class for custom path with two params as color and stroke size.
     internal inner class CustomPath(var color : Int, var brushThickness: Float) : Path(){
 
     }
